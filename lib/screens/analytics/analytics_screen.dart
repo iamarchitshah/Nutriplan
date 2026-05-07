@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nutriplan_ai/core/theme/app_theme.dart';
 import 'package:nutriplan_ai/providers/goal_provider.dart';
 import 'package:nutriplan_ai/providers/meal_provider.dart';
+import 'package:nutriplan_ai/utils/pdf_generator.dart';
 
 class AnalyticsScreen extends ConsumerWidget {
   const AnalyticsScreen({super.key});
@@ -16,6 +17,15 @@ class AnalyticsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Analytics'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf),
+            tooltip: 'Download Weekly Report',
+            onPressed: () {
+              PdfGenerator.generateWeeklyReport(goal, nutrition);
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

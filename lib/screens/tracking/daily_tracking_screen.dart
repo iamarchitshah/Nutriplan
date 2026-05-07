@@ -5,6 +5,7 @@ import 'package:nutriplan_ai/providers/auth_provider.dart';
 import 'package:nutriplan_ai/providers/goal_provider.dart';
 import 'package:nutriplan_ai/providers/meal_provider.dart';
 import 'package:nutriplan_ai/providers/water_provider.dart';
+import 'package:nutriplan_ai/providers/water_provider.dart';
 
 class DailyTrackingScreen extends ConsumerWidget {
   const DailyTrackingScreen({super.key});
@@ -13,6 +14,8 @@ class DailyTrackingScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final goal = ref.watch(goalProvider);
     final nutrition = ref.watch(dailyNutritionProvider);
+    final waterGlasses = ref.watch(waterProvider);
+    final streakAsync = ref.watch(streakProvider);
 
     if (goal == null) {
       return const Center(child: CircularProgressIndicator());
@@ -32,6 +35,8 @@ class DailyTrackingScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildCalorieCard(context, caloriesConsumed, caloriesRemaining, progress, goal.targetCalories),
+            const SizedBox(height: 24),
+            _buildWaterTracker(context, ref, waterGlasses, streakAsync),
             const SizedBox(height: 24),
             Text(
               'Macronutrients',
@@ -169,6 +174,62 @@ class DailyTrackingScreen extends ConsumerWidget {
               color: color,
               minHeight: 8,
               borderRadius: BorderRadius.circular(4),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWaterTracker(BuildContext context, WidgetRef ref, int glasses, AsyncValue<int> streakAsync) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Row(
+                  children: [
+                    Icon(Icons.water_drop, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text('Water Intake', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  ],
+                ),
+                streakAsync.when(
+                  data: (streak) => Row(
+                    children: [
+                      const Icon(Icons.local_fire_department, color: Colors.orange, size: 20),
+                      Text(' $streak Days', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange)),
+                    ],
+                  ),
+                  loading: () => const SizedBox(),
+                  error: (_, __) => const SizedBox(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('$glasses / 8', style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.blue)),
+                const Text(' glasses', style: TextStyle(fontSize: 16, color: Colors.grey)),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: () {
+                ref.read(waterProvider.notifier).addGlass();
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Add a Glass'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue.withValues(alpha: 0.1),
+                foregroundColor: Colors.blue,
+                elevation: 0,
+              ),
             ),
           ],
         ),
