@@ -4,6 +4,7 @@ import 'package:nutriplan_ai/core/theme/app_theme.dart';
 import 'package:nutriplan_ai/providers/auth_provider.dart';
 import 'package:nutriplan_ai/providers/goal_provider.dart';
 import 'package:nutriplan_ai/providers/meal_provider.dart';
+import 'package:nutriplan_ai/providers/water_provider.dart';
 
 class DailyTrackingScreen extends ConsumerWidget {
   const DailyTrackingScreen({super.key});
