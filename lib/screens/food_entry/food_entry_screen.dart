@@ -17,39 +17,48 @@ class FoodEntryScreen extends ConsumerStatefulWidget {
 
 class _FoodEntryScreenState extends ConsumerState<FoodEntryScreen> {
   final _formKey = GlobalKey<FormState>();
-  String _name = '';
-  double _quantity = 100;
-  int _calories = 0;
-  double _protein = 0;
-  double _carbs = 0;
-  double _fats = 0;
+  
+  late final TextEditingController _nameController;
+  late final TextEditingController _quantityController;
+  late final TextEditingController _caloriesController;
+  late final TextEditingController _proteinController;
+  late final TextEditingController _carbsController;
+  late final TextEditingController _fatsController;
 
   @override
   void initState() {
     super.initState();
-    if (widget.existingMeal != null) {
-      _name = widget.existingMeal!.name;
-      _quantity = widget.existingMeal!.quantity;
-      _calories = widget.existingMeal!.calories;
-      _protein = widget.existingMeal!.protein;
-      _carbs = widget.existingMeal!.carbs;
-      _fats = widget.existingMeal!.fats;
-    }
+    _nameController = TextEditingController(text: widget.existingMeal?.name ?? '');
+    _quantityController = TextEditingController(text: widget.existingMeal?.quantity.toString() ?? '100');
+    _caloriesController = TextEditingController(text: widget.existingMeal?.calories.toString() ?? '');
+    _proteinController = TextEditingController(text: widget.existingMeal?.protein.toString() ?? '0');
+    _carbsController = TextEditingController(text: widget.existingMeal?.carbs.toString() ?? '0');
+    _fatsController = TextEditingController(text: widget.existingMeal?.fats.toString() ?? '0');
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _quantityController.dispose();
+    _caloriesController.dispose();
+    _proteinController.dispose();
+    _carbsController.dispose();
+    _fatsController.dispose();
+    super.dispose();
   }
 
   void _saveFood() {
     if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
       final date = ref.read(selectedDateProvider);
 
       final meal = Meal(
         id: widget.existingMeal?.id ?? const Uuid().v4(),
-        name: _name,
-        quantity: _quantity,
-        calories: _calories,
-        protein: _protein,
-        carbs: _carbs,
-        fats: _fats,
+        name: _nameController.text,
+        quantity: double.tryParse(_quantityController.text) ?? 100,
+        calories: int.tryParse(_caloriesController.text) ?? 0,
+        protein: double.tryParse(_proteinController.text) ?? 0,
+        carbs: double.tryParse(_carbsController.text) ?? 0,
+        fats: double.tryParse(_fatsController.text) ?? 0,
         date: widget.existingMeal?.date ?? date,
         mealType: widget.mealType,
       );
@@ -77,6 +86,13 @@ class _FoodEntryScreenState extends ConsumerState<FoodEntryScreen> {
           icon: const Icon(Icons.close),
           onPressed: () => context.pop(),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: () => _showBarcodeScanner(context),
+            tooltip: 'Scan Barcode',
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -86,50 +102,47 @@ class _FoodEntryScreenState extends ConsumerState<FoodEntryScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
-                initialValue: widget.existingMeal?.name,
+                controller: _nameController,
                 decoration: const InputDecoration(
                   labelText: 'Food Name',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.restaurant),
                 ),
                 validator: (value) => value == null || value.isEmpty ? 'Required' : null,
-                onSaved: (value) => _name = value!,
               ),
               const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
                     child: TextFormField(
+                      controller: _quantityController,
                       decoration: const InputDecoration(
                         labelText: 'Quantity (g/ml)',
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
-                      initialValue: widget.existingMeal != null ? widget.existingMeal!.quantity.toString() : '100',
                       validator: (value) {
                         if (value == null || value.isEmpty) return 'Required';
                         if (double.tryParse(value) == null) return 'Invalid';
                         if (double.parse(value) <= 0) return 'Must be > 0';
                         return null;
                       },
-                      onSaved: (value) => _quantity = double.parse(value!),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: TextFormField(
+                      controller: _caloriesController,
                       decoration: const InputDecoration(
                         labelText: 'Calories (kcal)',
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
-                      initialValue: widget.existingMeal?.calories.toString(),
                       validator: (value) {
                         if (value == null || value.isEmpty) return 'Required';
                         if (int.tryParse(value) == null) return 'Invalid';
                         return null;
                       },
-                      onSaved: (value) => _calories = int.parse(value!),
                     ),
                   ),
                 ],
@@ -141,37 +154,34 @@ class _FoodEntryScreenState extends ConsumerState<FoodEntryScreen> {
                 children: [
                   Expanded(
                     child: TextFormField(
+                      controller: _proteinController,
                       decoration: const InputDecoration(
                         labelText: 'Protein (g)',
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
-                      initialValue: widget.existingMeal != null ? widget.existingMeal!.protein.toString() : '0',
-                      onSaved: (value) => _protein = double.tryParse(value ?? '0') ?? 0,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextFormField(
+                      controller: _carbsController,
                       decoration: const InputDecoration(
                         labelText: 'Carbs (g)',
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
-                      initialValue: widget.existingMeal != null ? widget.existingMeal!.carbs.toString() : '0',
-                      onSaved: (value) => _carbs = double.tryParse(value ?? '0') ?? 0,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextFormField(
+                      controller: _fatsController,
                       decoration: const InputDecoration(
                         labelText: 'Fats (g)',
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
-                      initialValue: widget.existingMeal != null ? widget.existingMeal!.fats.toString() : '0',
-                      onSaved: (value) => _fats = double.tryParse(value ?? '0') ?? 0,
                     ),
                   ),
                 ],
@@ -190,6 +200,61 @@ class _FoodEntryScreenState extends ConsumerState<FoodEntryScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showBarcodeScanner(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          height: 300,
+          child: Column(
+            children: [
+              const Text('Scan Food Barcode', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 24),
+              Container(
+                height: 150,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.black87,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.primary, width: 2),
+                ),
+                child: const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.qr_code_scanner, color: Colors.white, size: 64),
+                      SizedBox(height: 8),
+                      Text('Scanning...', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  context.pop();
+                  setState(() {
+                    _nameController.text = 'Oatmeal (Scanned)';
+                    _caloriesController.text = '150';
+                    _proteinController.text = '5';
+                    _carbsController.text = '27';
+                    _fatsController.text = '3';
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Food found via barcode!')),
+                  );
+                },
+                child: const Text('Simulate Successful Scan'),
+              )
+            ],
+          ),
+        );
+      }
     );
   }
 }

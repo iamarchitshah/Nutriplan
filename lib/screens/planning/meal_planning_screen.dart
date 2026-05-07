@@ -183,8 +183,63 @@ class MealPlanningScreen extends ConsumerWidget {
               alignment: Alignment.centerLeft,
             ),
           ),
+          TextButton.icon(
+            onPressed: () => _showAISuggestions(context, mealType),
+            icon: const Icon(Icons.auto_awesome, color: Colors.purple),
+            label: const Text('GET AI SUGGESTIONS', style: TextStyle(color: Colors.purple)),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              alignment: Alignment.centerLeft,
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  void _showAISuggestions(BuildContext context, String mealType) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              const Icon(Icons.auto_awesome, color: Colors.purple),
+              const SizedBox(width: 8),
+              Text('AI $mealType Ideas'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Here are some healthy suggestions based on your profile:'),
+              const SizedBox(height: 16),
+              ListTile(
+                title: const Text('Grilled Chicken Salad'),
+                subtitle: const Text('350 kcal | 40g Protein'),
+                trailing: const Icon(Icons.add_circle_outline),
+                onTap: () {
+                  context.pop();
+                  context.push('/add-food', extra: {'mealType': mealType});
+                },
+              ),
+              ListTile(
+                title: const Text('Quinoa & Tofu Bowl'),
+                subtitle: const Text('420 kcal | 25g Protein'),
+                trailing: const Icon(Icons.add_circle_outline),
+                onTap: () {
+                  context.pop();
+                  context.push('/add-food', extra: {'mealType': mealType});
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => context.pop(), child: const Text('Close')),
+          ],
+        );
+      }
     );
   }
 }

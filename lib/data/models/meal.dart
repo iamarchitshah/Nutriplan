@@ -72,4 +72,34 @@ class Meal extends HiveObject {
       isSynced: isSynced ?? this.isSynced,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'quantity': quantity,
+      'calories': calories,
+      'protein': protein,
+      'carbs': carbs,
+      'fats': fats,
+      'date': date.toIso8601String(),
+      'mealType': mealType,
+      'isSynced': isSynced,
+    };
+  }
+
+  factory Meal.fromMap(Map<String, dynamic> map) {
+    return Meal(
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      quantity: (map['quantity'] ?? 0.0).toDouble(),
+      calories: map['calories']?.toInt() ?? 0,
+      protein: (map['protein'] ?? 0.0).toDouble(),
+      carbs: (map['carbs'] ?? 0.0).toDouble(),
+      fats: (map['fats'] ?? 0.0).toDouble(),
+      date: map['date'] != null ? DateTime.parse(map['date']) : DateTime.now(),
+      mealType: map['mealType'] ?? '',
+      isSynced: map['isSynced'] ?? false,
+    );
+  }
 }

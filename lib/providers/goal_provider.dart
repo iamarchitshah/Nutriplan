@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nutriplan_ai/data/local/hive_service.dart';
+import 'package:nutriplan_ai/data/local/hive_service.dart';
 import 'package:nutriplan_ai/data/models/goal.dart';
+import 'package:nutriplan_ai/data/sync/firebase_service.dart';
 
 class GoalNotifier extends Notifier<Goal?> {
   @override
@@ -16,6 +18,7 @@ class GoalNotifier extends Notifier<Goal?> {
 
   Future<void> updateGoal(Goal goal) async {
     await HiveService.saveGoal(goal);
+    FirebaseService.syncGoal(goal);
     state = goal;
   }
 }

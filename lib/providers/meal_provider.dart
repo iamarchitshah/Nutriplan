@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nutriplan_ai/data/local/hive_service.dart';
+import 'package:nutriplan_ai/data/local/hive_service.dart';
 import 'package:nutriplan_ai/data/models/meal.dart';
+import 'package:nutriplan_ai/data/sync/firebase_service.dart';
 
 class MealNotifier extends Notifier<List<Meal>> {
   @override
@@ -10,16 +12,19 @@ class MealNotifier extends Notifier<List<Meal>> {
 
   Future<void> addMeal(Meal meal) async {
     await HiveService.saveMeal(meal);
+    FirebaseService.syncMeal(meal);
     state = HiveService.getAllMeals();
   }
 
   Future<void> updateMeal(Meal meal) async {
     await HiveService.saveMeal(meal);
+    FirebaseService.syncMeal(meal);
     state = HiveService.getAllMeals();
   }
 
   Future<void> deleteMeal(String id) async {
     await HiveService.deleteMeal(id);
+    FirebaseService.deleteMeal(id);
     state = HiveService.getAllMeals();
   }
 }

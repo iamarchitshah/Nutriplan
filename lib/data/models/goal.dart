@@ -48,4 +48,26 @@ class Goal extends HiveObject {
       isSynced: isSynced ?? this.isSynced,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'targetCalories': targetCalories,
+      'targetProtein': targetProtein,
+      'targetCarbs': targetCarbs,
+      'targetFats': targetFats,
+      'isSynced': isSynced,
+    };
+  }
+
+  factory Goal.fromMap(Map<String, dynamic> map) {
+    return Goal(
+      id: map['id'] ?? '',
+      targetCalories: map['targetCalories']?.toInt() ?? 0,
+      targetProtein: (map['targetProtein'] ?? 0.0).toDouble(),
+      targetCarbs: (map['targetCarbs'] ?? 0.0).toDouble(),
+      targetFats: (map['targetFats'] ?? 0.0).toDouble(),
+      isSynced: map['isSynced'] ?? false,
+    );
+  }
 }
